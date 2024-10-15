@@ -79,6 +79,7 @@ def api_auth_required(f):
 
 
 def get_images(path):
+  path = os.path.join("static", path)
   if os.path.exists(path):
     return [image for image in os.listdir(path) if image.endswith(".jpg")]
   return []

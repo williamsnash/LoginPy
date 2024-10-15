@@ -34,6 +34,7 @@ def index():
     return render_template("login.html", message="Invalid credentials", color="red")
 
   url_color = request.args.get("color")
+  color = ""
   if url_color == "success":
     color = "green"
   elif url_color == "danger":
@@ -119,4 +120,6 @@ def test_api():
 
 
 if __name__ == "__main__":
+  db = database()
+  db.create_table()
   api.run(debug=True)

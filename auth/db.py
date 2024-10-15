@@ -7,7 +7,7 @@ class database():
     self.conn = sqlite3.connect('auth.db')
     self.cursor = self.conn.cursor()
 
-  def create_db(self):
+  def create_table(self):
     """Creates the db (Really for testing purposes)
     """
     self.cursor.execute('''CREATE TABLE IF NOT EXISTS auth
