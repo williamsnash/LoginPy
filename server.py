@@ -1,17 +1,17 @@
 from datetime import timedelta, datetime
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, send_from_directory, url_for, session
 
 from auth import database, passwd_hash
 from server_helper import *
 
-api = Flask(__name__)
-api.secret_key = 'cb7da859c508a40d17764bf9217db602'
-api.permanent_session_lifetime = timedelta(minutes=30)
+app = Flask(__name__)
+app.secret_key = 'cb7da859c508a40d17764bf9217db602'
+app.permanent_session_lifetime = timedelta(minutes=30)
 
 REG_OPEN = True
 
 
-@api.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
   if session.get("logged_in"):
     return render_template("home.html",
@@ -43,7 +43,7 @@ def index():
   return render_template("login.html", message=request.args.get("message", ""), color=color)
 
 
-@api.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
   if not REG_OPEN:
     return render_template("error.html", error_code="500", error_message="Registration is closed")
@@ -70,7 +70,7 @@ def register():
   return render_template("register.html")
 
 
-@api.route("/logout")
+@app.route("/logout")
 def logout():
   session["logged_in"] = False
   now = datetime.now()
@@ -81,7 +81,7 @@ def logout():
   return redirect(url_for('index', message="Logged out successfully", color="success"))
 
 
-@api.route("/delete_account")
+@app.route("/delete_account")
 def delete_account():
   db = database()
   username = session.get("username")
@@ -92,34 +92,61 @@ def delete_account():
   return redirect(url_for('index', message="Account deleted successfully", color="success"))
 
 
-@api.route("/masonry-bordered")
+@app.route("/masonry/<style>")
 @login_required
-def masonry_bordered():
+def masonry_parent(style):
   path = request.args.get("path", "")
-  return render_template("masonry/bordered.html", path=path, images=get_images(path))
+
+  # Default to page 1
+  page = request.args.get('page', 1, type=int)
+
+  # Default to 10 items per page
+  per_page = request.args.get('per_page', 100, type=int)
+
+  resp, _ = list_images(path, page, per_page)
+
+  html = "masonry/gutterless.html"
+
+  if style == "gutterless":
+    html = "masonry/gutterless.html"
+  elif style == "bordered":
+    html = "masonry/bordered.html"
+  elif style == "with-gutter":
+    html = "masonry/with_gutter.html"
+
+  return render_template(html, path=path, images=resp.get("images"), total_pages=resp.get("total_pages"))
 
 
-@api.route("/masonry-gutterless")
+@app.route('/list-images/<path>', methods=['GET'])
 @login_required
-def masonry_gutterless():
-  path = request.args.get("path", "")
-  return render_template("masonry/gutterless.html", path=path, images=get_images(path))
+def API_list_images(path):
+
+  page = request.args.get('page', 1, type=int)  # Default to page 1
+  # Default to 10 items per page
+  per_page = request.args.get('per_page', 100, type=int)
+
+  resp, code = list_images(path, page, per_page)
+  return resp, code
 
 
-@api.route("/masonry-with-gutter")
+@app.route('/images/<folder>/<filename>', methods=['GET'])
 @login_required
-def masonry_with_gutter():
-  path = request.args.get("path", "")
-  return render_template("masonry/with_gutter.html", path=path, images=get_images(path))
+def serve_image(folder, filename):
+  if folder not in FOLDER_PATHS:
+    return jsonify([]), 404
+  try:
+    return send_from_directory(FOLDER_PATHS[folder], filename)
+  except FileNotFoundError:
+    return jsonify([]), 404
 
 
-@api.route("/test-api", methods=["POST"])
-@api_auth_required
-def test_api():
+@app.route("/test-api", methods=["POST"])
+@login_required
+def API_test():
   return jsonify({"message": "API is working"})
 
 
 if __name__ == "__main__":
   db = database()
   db.create_table()
-  api.run(debug=True)
+  app.run(debug=True)

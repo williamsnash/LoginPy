@@ -13,6 +13,9 @@ A simple login system using Python and SQLite3 to have a http server using Flask
 - 2 function wraps
   - Login required - Used for html routes that require login
   - Api Auth required - Used for api routes that require login
+- Pagination of large image folders
+- Custom image folders not in static folder
+- Reduce code logic for 3 masonry layout to help reduce change issues
 
 ## Setup/ Running
 1. Install the required packages
