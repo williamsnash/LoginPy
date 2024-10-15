@@ -2,18 +2,10 @@ import base64
 import os
 from functools import wraps
 from flask import jsonify, render_template, request, session, redirect, url_for
+from config import *
 
 from auth import passwd_hash
 from auth.db import database
-
-
-def login_required(f):
-  @wraps(f)
-  def decorated_function(*args, **kwargs):
-    if not session.get("logged_in"):
-      return redirect(url_for('index', message="You need to login first", color="danger"))
-    return f(*args, **kwargs)
-  return decorated_function
 
 
 def get_basic_auth_data(auth_header):
@@ -49,7 +41,7 @@ def get_user(username, password):
     return False, None
 
   verified = passwd_hash.verify_password(
-    password=password, hashed_password=user[2])
+      password=password, hashed_password=user[2])
 
   if not verified:
     return False, None
@@ -57,22 +49,26 @@ def get_user(username, password):
   return True, user
 
 
-def api_auth_required(f):
+def login_required(f):
   @wraps(f)
   def decorated_function(*args, **kwargs):
-    auth_header = request.headers.get("Authorization")
 
-    # Extract username and password from the Authorization header
-    auth_data = get_basic_auth_data(auth_header)
+    if not session.get("logged_in"): # If not user session (HTML login)
 
-    if auth_data is None:
-      return jsonify({"error": "Missing or invalid Authorization header"}), 401
+      # Do api auth
+      auth_header = request.headers.get("Authorization")
 
-    username, password = auth_data
-    verified, user = get_user(username, password)
+      # Extract username and password from the Authorization header
+      auth_data = get_basic_auth_data(auth_header)
 
-    if not verified:
-      return jsonify({"error": "Invalid credentials"}), 401
+      if auth_data is None:
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+
+      username, password = auth_data
+      verified, user = get_user(username, password)
+
+      if not verified:
+        return jsonify({"error": "Invalid credentials"}), 401
 
     return f(*args, **kwargs)
   return decorated_function
@@ -99,3 +95,29 @@ def register_session(user):
                          last_login=session.get("last_login"),
                          profile_pic=session.get("profile_pic")
                          )
+
+
+def list_images(path, page=1, per_page=100):
+  if path not in FOLDER_PATHS:
+    return {}, 405
+
+  try:
+    files = os.listdir(FOLDER_PATHS[path])
+    image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp')
+    images = [f for f in files if f.lower().endswith(image_extensions)]
+
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    paginated_images = images[start:end]
+
+    return {
+        "images": paginated_images,
+        "total_images": len(images),
+        "total_pages": (len(images) + per_page - 1) // per_page,
+        "page": page,
+        "per_page": per_page
+    }, 200
+
+  except FileNotFoundError:
+    return {}, 404

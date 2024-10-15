@@ -1,10 +1,10 @@
 {% extends 'masonry/base_masonry.html' %}
 
 {% block intro %}
-<h3><a href="{{ url_for('masonry_with_gutter') }}" id="masonryLink1" title="masonry-with-gutter.html">With
+<h3><a href="/masonry/with-gutter" id="masonryLink1" title="masonry-with-gutter.html">With
         Gutter</a></h3>
 <h3 title="Bordered Masonry">Bordered</h3>
-<h3><a href="{{ url_for('masonry_gutterless') }}" id="masonryLink2" title="Gutterless masonry">Gutterless</a>
+<h3><a href="/masonry/gutterless" id="masonryLink2" title="Gutterless masonry">Gutterless</a>
 </h3>
 {% endblock %}
 
@@ -12,10 +12,8 @@
 <div class="masonry bordered">
     {%for i in images%}
     <div class="brick">
-        <img src="{{ url_for('static',filename='images/' + i) }}" alt="{{i}}" title="{{i}}">
+        <img src="{{url_for('serve_image', folder=path, filename=i)}}" alt="{{i}}" title="{{i}}">
     </div>
     {%endfor%}
 </div><!-- .masonry -->
-<a href="http://w3bits.com/css-masonry/" class="lab-article-button"
-    title="Learn more about this demo, read the tutorial">Read the Article &#187;</a>
 {% endblock %}

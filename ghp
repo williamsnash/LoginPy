@@ -1,0 +1,69 @@
+help_message='''
+How to Use:
+  1. {script_name_here} {commit_message_here}
+      - This will run a `git add .`; `git commit -m {commit_message_here}`; `git push -u origin {current_branch name}`
+  2. {script_name_here} -m "{commit_message_here}"
+      - Same as above, but more inline with the `git commit -m` command
+  3. {script_name_here} -a -m "{commit_message_here}"
+      - Similar as above for commit message and pushing
+      - However this uses `git add --all` instead of `git add .`
+
+About Flags
+  -a: changes `git add .` to `git add --all` !!!Must use -m ""!!!
+  -m: Used as the commit message
+'''
+
+#------------------------------------------------------------
+# Checks for / gets commmand line arguments
+message_flag=false
+all=false
+while getopts 'ahm:' OPTIONS; 
+do
+    case "$OPTIONS" in
+        a) all=true;;
+        m) message=${OPTARG}
+            message_flag=true;;
+        h) echo "$help_message"
+            exit 0;;
+    esac
+done
+
+#------------------------------------------------------------
+# Check to make sure the need argmuents are present or not
+if ! $message_flag && $all ; then
+    echo "To use the -a flag, the -m flag with a message must also be used"
+    exit 3
+fi
+
+if ! $all && ! $message_flag ; then
+    message=$@
+fi
+
+if [ -z "$message" ]; then
+    echo "Not Running as commit message is empty"
+    exit 2
+fi
+
+#------------------------------------------------------------
+# Checks if the current directory is a git repository
+EXIT_CODE=0
+git branch &>/dev/null || EXIT_CODE=$?
+
+#------------------------------------------------------------
+if [ $EXIT_CODE -eq 0 ]; then # If the current directory is a git repository
+    BRANCH=$(git branch | grep "*" | cut -d' ' -f2) # Gets the current branch name by parsing git branch
+
+    if [ $all ]; then
+        git add --all
+    else
+        git add .
+    fi
+    git commit -m "$message"
+    git push -u origin $BRANCH
+# else # If the current directory is not a git repository
+#     if [ $EXIT_CODE -eq 128 ]; then
+#         echo "Directory not a git repository"
+#     else
+#         echo "Unknown error"
+#     fi
+fi

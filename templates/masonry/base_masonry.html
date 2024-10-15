@@ -12,8 +12,8 @@
 <body class="labs-template-default single single-labs postid-2409 logged-in admin-bar no-customize-support">
   <div class="container">
     <nav class="cf lab-nav lab-nav--light">
-      <a href="http://w3bits.com/css-masonry/" title="Back to the article" class="lab-article-link">&#171;
-        Article</a>
+      <a href="/" title="Back User Home" class="lab-article-link">&#171;
+        Home</a>
       <ul class="lab-share">
         <li>
           <a href="https://www.addthis.com/bookmark.php?url=http://w3bits.com/css-masonry/"
@@ -30,11 +30,32 @@
       </div><!-- .intro -->
       <!-- Masonry Block -->
       {% block content %} {% endblock %}
+      <br>
+      <button id="prev-btn" onclick="loadImages(currentPage - 1)" disabled>Previous</button>
+      <button id="next-btn" onclick="loadImages(currentPage + 1)">Next</button>
+      <br><br><br>
     </div>
   </div>
   <script>
     // Get the current URL parameters
     const params = new URLSearchParams(window.location.search);
+    let currentPage = 1;
+    const max_pages = {{ total_pages }};
+
+    for ([key, value] of params.entries()) {
+      if (key === 'page') {
+        currentPage = parseInt(value);
+      }
+    }
+    if (currentPage > 1) {
+      document.getElementById('prev-btn').removeAttribute('disabled');
+    }
+    if (currentPage < 2) {
+      document.getElementById('prev-btn').setAttribute('disabled', true);
+    }
+    if (currentPage >= max_pages) {
+      document.getElementById('next-btn').setAttribute('disabled', true);
+    }
 
     // If there are any parameters, append them to all links with 'masonryLink' id
     if (params.toString()) {
@@ -42,6 +63,12 @@
       masonryLinks.forEach(link => {
         link.href += '?' + params.toString();
       });
+    }
+
+    function loadImages(page) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', page);
+      window.location.href = url
     }
   </script>
 </body>
