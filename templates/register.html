@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Register</title>
+</head>
+
+<body>
+    <h1>Register</h1>
+    <form id="registerForm" action="/register" method="post">
+        <label>Username</label><br>
+        <input type="text" name="username" placeholder="Username" required>
+        <br><br>
+        <label>Name</label><br>
+        <input type="text" name="name" placeholder="Name" required>
+        <br><br>
+        <label>Password</label><br>
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <br><br>
+        <label>Confirm Password</label><br>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+        <br><br>
+        <span id="error-message" style="color:red; display:none;">Passwords do not match</span>
+        <br>
+        <button type="submit">Register</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const errorMessage = document.getElementById('error-message');
+
+        form.addEventListener('submit', function (event) {
+            // Prevent form submission if passwords do not match
+            if (password.value !== confirmPassword.value) {
+                errorMessage.style.display = 'block';
+                event.preventDefault();  // Stops form submission
+            } else {
+                errorMessage.style.display = 'none';
+            }
+        });
+
+        // Hide the error message when typing in either password field
+        password.addEventListener('input', () => errorMessage.style.display = 'none');
+        confirmPassword.addEventListener('input', () => errorMessage.style.display = 'none');
+    </script>
+</body>
+
+</html>

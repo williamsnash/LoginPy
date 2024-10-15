@@ -1,0 +1,20 @@
+{% extends 'masonry/base_masonry.html' %}
+
+{% block intro %}
+<h3 title="Masonry with Gutter">With Gutter</h3>
+<h3><a href="{{ url_for('masonry_bordered') }}" id="masonryLink1" title="Bordered Masonry">Bordered</a></h3>
+<h3><a href="{{ url_for('masonry_gutterless') }}" id="masonryLink2" title="Gutterless masonry">Gutterless</a>
+</h3>
+{% endblock %}
+
+{% block content %}
+<div class="masonry">
+    {%for i in images%}
+    <div class="brick">
+        <img src="{{ url_for('static',filename='images/' + i) }}" alt="{{i}}" title="{{i}}">
+    </div>
+    {%endfor%}
+</div><!-- .masonry -->
+<a href="http://w3bits.com/css-masonry/" class="lab-article-button"
+    title="Learn more about this demo, read the tutorial">Read the Article &#187;</a>
+{% endblock %}

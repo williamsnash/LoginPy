@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en-US" class="has-lab-nav-bottom lab-theme-light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Responsive CSS Masonry - {{path}}</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/labs.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='styles/masonry.css') }}">
+</head>
+
+<body class="labs-template-default single single-labs postid-2409 logged-in admin-bar no-customize-support">
+  <div class="container">
+    <nav class="cf lab-nav lab-nav--light">
+      <a href="http://w3bits.com/css-masonry/" title="Back to the article" class="lab-article-link">&#171;
+        Article</a>
+      <ul class="lab-share">
+        <li>
+          <a href="https://www.addthis.com/bookmark.php?url=http://w3bits.com/css-masonry/"
+            title="Share this page">Share &#187;</a>
+        </li>
+      </ul>
+    </nav><!-- .lab-nav -->
+    <div class="wrapper">
+      <h1 class="title">CSS Masonry - {{path}}</h1>
+      <h2 class="desc">100% Responsive. Resize the browser window to see the action.</h2>
+      <div class="intro">
+        {% block intro %} {% endblock %}
+
+      </div><!-- .intro -->
+      <!-- Masonry Block -->
+      {% block content %} {% endblock %}
+    </div>
+  </div>
+  <script>
+    // Get the current URL parameters
+    const params = new URLSearchParams(window.location.search);
+
+    // If there are any parameters, append them to all links with 'masonryLink' id
+    if (params.toString()) {
+      const masonryLinks = document.querySelectorAll('[id^="masonryLink"]');
+      masonryLinks.forEach(link => {
+        link.href += '?' + params.toString();
+      });
+    }
+  </script>
+</body>
