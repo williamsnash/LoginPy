@@ -2,9 +2,10 @@
 <html>
     <header>
         <title>Error - {{error_code}}</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='styles/home.css') }}">
     </header>
-    <body>
-        <h1>Error {{error_code}}</h1>
+    <body class="body">
+        <h1>Error - {{error_code}}</h1>
         <p>{{error_message}}</p>
         <a href="/">Go back to the homepage</a>
     </body>
