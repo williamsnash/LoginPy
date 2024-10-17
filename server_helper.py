@@ -41,7 +41,7 @@ def get_user(username, password):
     return False, None
 
   verified = passwd_hash.verify_password(
-      password=password, hashed_password=user[2])
+      password=password, hashed_password=user["password_hash"])
 
   if not verified:
     return False, None
@@ -53,7 +53,7 @@ def login_required(f):
   @wraps(f)
   def decorated_function(*args, **kwargs):
 
-    if not session.get("logged_in"): # If not user session (HTML login)
+    if not session.get("logged_in"):  # If not user session (HTML login)
 
       # Do api auth
       auth_header = request.headers.get("Authorization")
@@ -79,16 +79,6 @@ def get_images(path):
   if os.path.exists(path):
     return [image for image in os.listdir(path) if image.endswith(".jpg")]
   return []
-
-
-def register_session(user):
-  session.permanent = True
-  session["logged_in"] = True
-  session["username"] = user[1]
-  session["name"] = user[3]
-  session["profile_pic"] = user[4]
-  session["last_login"] = user[6]
-  session["last_password_change"] = user[5]
 
 
 def list_images(path, page=1, per_page=100):

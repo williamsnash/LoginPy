@@ -31,7 +31,8 @@ A simple login system using Python and SQLite3 to have a http server using Flask
 
 ## TODOs
 - [ ] Admin Page
-- [ ] 
+- [ ] Video Support
+- [ ] Clicking media opening large viewer
 
 
 ## Files

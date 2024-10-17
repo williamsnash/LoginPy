@@ -5,6 +5,7 @@ class database():
 
   def __init__(self):
     self.conn = sqlite3.connect('auth.db')
+    self.conn.row_factory = sqlite3.Row  # This enables dictionary-like access
     self.cursor = self.conn.cursor()
 
   def create_table(self):
@@ -15,6 +16,7 @@ class database():
               username TEXT,
               password_hash TEXT,
               name TEXT,
+              role TEXT,
               profile_icon TEXT,
               last_password_change TEXT,
               last_login TEXT)''')
@@ -32,17 +34,19 @@ class database():
         last_login (string): Date of the last login
     """
     # sdfsd
+    default_role = 'user'
     self.cursor.execute(
         """INSERT INTO auth
         (username, 
         password_hash,
         name,
+        role,
         profile_icon,
         last_password_change,
         last_login)
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
-        (username, password_hash, name, profile_icon, last_password_change, last_login))
+        (username, password_hash, name, default_role, profile_icon, last_password_change, last_login))
     self.conn.commit()
 
   def update_user(self, id, **kwargs):
@@ -62,7 +66,6 @@ class database():
     # List comprehension to create a list of keys
     set_clause = ", ".join([f"{key} = ?" for key in kwargs.keys()])
     sql = f"UPDATE auth SET {set_clause} WHERE id = ?"
-
     # Add values and id to the list for the execute
     self.cursor.execute(sql, list(kwargs.values()) + [id])
     self.conn.commit()
@@ -86,7 +89,7 @@ class database():
         Set: A single user from the database
     """
     self.cursor.execute("SELECT * FROM auth WHERE username = ?", (username,))
-    return self.cursor.fetchone()
+    return dict(self.cursor.fetchone())
 
   def close(self):
     self.conn.close()

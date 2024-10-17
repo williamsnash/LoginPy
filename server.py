@@ -25,10 +25,15 @@ def index():
     password = request.form.get('password')
 
     verified, user = get_user(username, password)
+    print(user)
 
     if verified:
       # Allows the user to close the page but the session remain (until the TLL runs out)
-      register_session(user)
+      session.permanent = True
+      session["logged_in"] = True
+      for key, value in user.items():
+        session[key] = value
+
       return render_template("home.html",
                              name=session.get("name"),
                              last_login=session.get("last_login"),
@@ -46,6 +51,11 @@ def index():
     color = "red"
 
   return render_template("login.html", message=request.args.get("message", ""), color=color)
+
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+  pass
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -81,7 +91,7 @@ def logout():
   now = datetime.now()
   formatted_date = now.strftime("%Y-%m-%d | %I:%M.%S %p")
   db = database()
-  db.update_user(session.get("username"), last_login=formatted_date)
+  db.update_user(session.get("id"), last_login=formatted_date)
   session.clear()
   return redirect(url_for('index', message="Logged out successfully", color="success"))
 
