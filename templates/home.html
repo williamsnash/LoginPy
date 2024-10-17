@@ -1,9 +1,11 @@
 <!DOCTYPE html>
+
 <header>
     <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/home.css') }}">
 </header>
 
-<body>
+<body class="body">
     <div class="bHeader">
         <h1>Welcome {{ name }}</h1>
         <h3>Last Login: {{ last_login }}</h3>
@@ -16,6 +18,12 @@
         </form>
     </div>
     <div class="bBody">
-        <a href="/masonry/with-gutter?path=images">Masonry</a>
+        <h2>Choose a folder</h2>
+        <div class="masonry-links">
+            {%for i in folders%}
+            <a href="/masonry/with-gutter?path={{i}}">{{i}}</a><br>
+            {%endfor%}
+            <!-- <a href="/masonry/with-gutter?path=images">Masonry</a> -->
+        </div>
     </div>
 </body>

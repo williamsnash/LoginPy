@@ -90,12 +90,6 @@ def register_session(user):
   session["last_login"] = user[6]
   session["last_password_change"] = user[5]
 
-  return render_template("home.html",
-                         name=session.get("name"),
-                         last_login=session.get("last_login"),
-                         profile_pic=session.get("profile_pic")
-                         )
-
 
 def list_images(path, page=1, per_page=100):
   if path not in FOLDER_PATHS:

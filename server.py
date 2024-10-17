@@ -8,16 +8,16 @@ app = Flask(__name__)
 app.secret_key = 'cb7da859c508a40d17764bf9217db602'
 app.permanent_session_lifetime = timedelta(minutes=30)
 
-REG_OPEN = True
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
   if session.get("logged_in"):
+    print(list(FOLDER_PATHS.keys()))
     return render_template("home.html",
                            name=session.get("name"),
                            last_login=session.get("last_login"),
-                           profile_pic=session.get("profile_pic")
+                           profile_pic=session.get("profile_pic"),
+                           folders=list(FOLDER_PATHS.keys())
                            )
 
   if request.method == "POST":
@@ -29,7 +29,13 @@ def index():
 
     if verified:
       # Allows the user to close the page but the session remain (until the TLL runs out)
-      return register_session(user)
+      register_session(user)
+      return render_template("home.html",
+                             name=session.get("name"),
+                             last_login=session.get("last_login"),
+                             profile_pic=session.get("profile_pic"),
+                             folders=list(FOLDER_PATHS.keys())
+                             )
 
     return render_template("login.html", message="Invalid credentials", color="red")
 
@@ -114,8 +120,12 @@ def masonry_parent(style):
   elif style == "with-gutter":
     html = "masonry/with_gutter.html"
 
-  return render_template(html, path=path, images=resp.get("images"), total_pages=resp.get("total_pages"))
+  return render_template(html, path=path, images=resp.get("images"), page=page, total_pages=resp.get("total_pages"))
 
+
+# @app.route("/test")
+# def test():
+#   return render_template("test.html")
 
 @app.route('/list-images/<path>', methods=['GET'])
 @login_required
