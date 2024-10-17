@@ -29,6 +29,11 @@ A simple login system using Python and SQLite3 to have a http server using Flask
 3. If deploying for prod. Change api.run(debug=True) to api.run(debug=False) in server.py
 
 
+## TODOs
+- [ ] Admin Page
+- [ ] 
+
+
 ## Files
 ### server.py
 - The main file that runs the server
