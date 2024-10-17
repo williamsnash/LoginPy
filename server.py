@@ -12,7 +12,6 @@ app.permanent_session_lifetime = timedelta(minutes=30)
 @app.route("/", methods=["GET", "POST"])
 def index():
   if session.get("logged_in"):
-    print(list(FOLDER_PATHS.keys()))
     return render_template("home.html",
                            name=session.get("name"),
                            last_login=session.get("last_login"),
